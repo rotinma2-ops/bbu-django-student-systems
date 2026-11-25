@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}403 Forbidden{% endblock %}
+{% block topbar_title %}Access denied{% endblock %}
+
+{% block content %}
+<div class="center-wrap">
+    <div class="card confirm rise" style="max-width:640px">
+        <div class="err-code">403</div>
+        <div class="confirm-ic" style="margin-top:6px"><svg class="ic"><use href="#i-lock"/></svg></div>
+
+        <h1>ការអនុញ្ញាតត្រូវបានបដិសេធ</h1>
+        <p class="text-muted" style="margin:6px 0 18px;font-weight:700">Access Forbidden / Access Denied</p>
+
+        <p class="text-muted">
+            {{ exception|default:"អ្នកមិនមានសិទ្ធិគ្រប់គ្រាន់ដើម្បីចូលមើល កែប្រែ ឬលុបទិន្នន័យនេះឡើយ។ ប្រសិនបើអ្នកជានិស្សិត អ្នកអាចមើលនិងកែប្រែបានតែប្រវត្តិរូបផ្ទាល់ខ្លួនរបស់អ្នកប៉ុណ្ណោះ។" }}
+        </p>
+        <p class="small text-faint" style="margin-bottom:28px">
+            You do not have permission to access, edit, or delete this record. Student accounts can only manage their own profile.
+        </p>
+
+        <div class="btns">
+            {% if user.is_authenticated and user.student %}
+            <a href="{% url 'students:student_detail' user.student.pk %}" class="btn btn-primary">
+                <svg class="ic"><use href="#i-user"/></svg> ទៅកាន់ប្រវត្តិរូបខ្ញុំ (My Profile)
+            </a>
+            {% endif %}
+            <a href="{% url 'home' %}" class="btn btn-ghost">
+                <svg class="ic"><use href="#i-home"/></svg> ទំព័រដើម (Home)
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

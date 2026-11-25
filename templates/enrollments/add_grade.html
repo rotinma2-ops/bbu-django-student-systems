@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Add Grade{% endblock %}
+{% block topbar_title %}Grade entry{% endblock %}
+
+{% block content %}
+<ol class="crumbs" aria-label="breadcrumb">
+    <li><a href="{% url 'home' %}">Home</a></li>
+    <li><a href="{% url 'enrollments:enrollment_list' %}">Enrollments</a></li>
+    <li><a href="{% url 'enrollments:enrollment_detail' enrollment.id %}">Details</a></li>
+    <li aria-current="page">Add Grade</li>
+</ol>
+
+<div class="page-head rise">
+    <div>
+        <span class="eyebrow">Grade entry</span>
+        <h1>Add Grade<small>{{ enrollment.student.user.get_full_name }} · {{ enrollment.course.code }} - {{ enrollment.course.title }}</small></h1>
+    </div>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="split">
+        <div class="stack">
+            <div class="card rise rise-1">
+                <div class="card-head"><h2><span class="num"><svg class="ic" style="font-size:14px"><use href="#i-check"/></svg></span> Grade Entry</h2></div>
+                <div class="card-body">
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger"><svg class="ic"><use href="#i-alert"/></svg><div>{{ form.non_field_errors }}</div></div>
+                    {% endif %}
+
+                    <div class="form-grid">
+                        {% for field in form %}
+                        <div class="field {% if field.name == 'notes' %}full{% endif %} {% if field.errors %}has-error{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}<div class="invalid-feedback">{{ field.errors.0 }}</div>{% endif %}
+                            {% if field.help_text %}<small class="help">{{ field.help_text|safe }}</small>{% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row-gap">
+                <button type="submit" class="btn btn-green btn-lg"><svg class="ic"><use href="#i-check"/></svg> Submit Grade</button>
+                <a href="{% url 'enrollments:enrollment_detail' enrollment.id %}" class="btn btn-ghost btn-lg"><svg class="ic"><use href="#i-x"/></svg> Cancel</a>
+            </div>
+        </div>
+
+        <aside class="card rise rise-2">
+            <div class="card-head"><h3>Current Information</h3></div>
+            <div class="card-body">
+                <dl class="kv kv-1">
+                    <div><dt>Current Score</dt><dd>{{ enrollment.score|default:"Not set" }}</dd></div>
+                    <div><dt>Current Grade</dt><dd>{{ enrollment.grade|default:"Not set" }}</dd></div>
+                    <div><dt>Current Attendance</dt><dd>{{ enrollment.attendance_percentage|default:"Not set" }}%</dd></div>
+                    <div><dt>Status</dt><dd><span class="badge b-gray">{{ enrollment.get_status_display }}</span></dd></div>
+                </dl>
+            </div>
+        </aside>
+    </div>
+</form>
+{% endblock %}

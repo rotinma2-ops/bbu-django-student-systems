@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Enrollment{% endblock %}
+{% block topbar_title %}Confirm delete{% endblock %}
+
+{% block content %}
+<div class="center-wrap">
+    <div class="card confirm rise">
+        <div class="confirm-ic"><svg class="ic"><use href="#i-trash"/></svg></div>
+        <h1>Confirm Delete</h1>
+        <p class="text-muted" style="margin-top:8px">Are you sure you want to delete this enrollment?</p>
+
+        <div class="detail">
+            <div><span>Student</span><b>{{ enrollment.student.user.get_full_name }}</b></div>
+            <div><span>Course</span><b>{{ enrollment.course.code }} - {{ enrollment.course.title }}</b></div>
+            <div><span>Status</span><b>{{ enrollment.get_status_display }}</b></div>
+        </div>
+
+        <div class="warn"><strong>Warning:</strong> This action cannot be undone. The enrollment record will be permanently deleted.</div>
+
+        <div class="btns">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger"><svg class="ic"><use href="#i-trash"/></svg> Yes, Delete</button>
+            </form>
+            <a href="{% url 'enrollments:enrollment_detail' enrollment.id %}" class="btn btn-ghost"><svg class="ic"><use href="#i-arrow-left"/></svg> Cancel</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

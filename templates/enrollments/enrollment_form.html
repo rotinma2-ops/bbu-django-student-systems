@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit Enrollment{% else %}Add New Enrollment{% endif %}{% endblock %}
+{% block topbar_title %}{% if form.instance.pk %}Edit enrollment{% else %}New enrollment{% endif %}{% endblock %}
+
+{% block extra_css %}
+<!-- Tom Select CSS for searchable dropdowns (themed in style.css) -->
+<link rel="stylesheet" href="{% static 'css/tom-select.bootstrap5.min.css' %}">
+{% endblock %}
+
+{% block content %}
+<ol class="crumbs" aria-label="breadcrumb">
+    <li><a href="{% url 'home' %}">Home</a></li>
+    <li><a href="{% url 'enrollments:enrollment_list' %}">Enrollments</a></li>
+    <li aria-current="page">{% if form.instance.pk %}Edit{% else %}Create{% endif %}</li>
+</ol>
+
+<div style="max-width:780px">
+    <div class="page-head rise">
+        <div>
+            <span class="eyebrow">{% if form.instance.pk %}Edit record{% else %}New record{% endif %}</span>
+            <h1>
+                {% if form.instance.pk %}Edit Enrollment
+                <small>{{ form.instance.student.student_id }} - {{ form.instance.course.code }}</small>
+                {% else %}Add New Enrollment
+                <small>ចុះឈ្មោះមុខវិជ្ជា · ជ្រើសរើសនិស្សិត និងមុខវិជ្ជាដោយងាយស្រួលតាមរយៈការវាយស្វែងរក</small>
+                {% endif %}
+            </h1>
+        </div>
+    </div>
+
+    <div class="card rise rise-1">
+        <div class="card-body" style="padding:30px">
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                <svg class="ic"><use href="#i-alert"/></svg>
+                <div>{% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}</div>
+            </div>
+            {% endif %}
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <!-- Student -->
+                <div class="field" style="margin-bottom:26px">
+                    <label for="id_student" class="form-label">👤 និស្សិត (Student) <span class="req">*</span></label>
+                    {{ form.student }}
+                    {% if form.student.errors %}<div class="invalid-feedback">{{ form.student.errors.0 }}</div>{% endif %}
+                    <div class="search-hint">💡 <strong>គន្លឹះ៖</strong> វាយបញ្ចូលអត្តលេខ (ID ឧ. STU1001), ឈ្មោះខ្មែរ (ឧ. សុខ), ឬឈ្មោះឡាតាំង ដើម្បីស្វែងរកភ្លាមៗ</div>
+                </div>
+
+                <!-- Course -->
+                <div class="field" style="margin-bottom:26px">
+                    <label for="id_course" class="form-label">📚 មុខវិជ្ជា (Course) <span class="req">*</span></label>
+                    {{ form.course }}
+                    {% if form.course.errors %}<div class="invalid-feedback">{{ form.course.errors.0 }}</div>{% endif %}
+                    <div class="search-hint">💡 <strong>គន្លឹះ៖</strong> វាយបញ្ចូលកូដមុខវិជ្ជា (ឧ. IT-101), ឈ្មោះមុខវិជ្ជា (ឧ. Python, Database), ឬឈ្មោះសាស្រ្តាចារ្យ</div>
+                </div>
+
+                <!-- Status -->
+                <div class="field">
+                    <label for="id_status" class="form-label">📌 ស្ថានភាព (Enrollment Status)</label>
+                    {{ form.status }}
+                    {% if form.status.errors %}<div class="invalid-feedback">{{ form.status.errors.0 }}</div>{% endif %}
+                </div>
+
+                <hr style="margin:30px 0 24px">
+
+                <div class="row-gap">
+                    <button type="submit" class="btn btn-primary btn-lg"><svg class="ic"><use href="#i-save"/></svg> រក្សាទុក (Save Enrollment)</button>
+                    <a href="{% url 'enrollments:enrollment_list' %}" class="btn btn-ghost btn-lg"><svg class="ic"><use href="#i-x"/></svg> បោះបង់ (Cancel)</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Tom Select JS for instant searchable dropdowns -->
+<script src="{% static 'js/tom-select.complete.min.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Searchable Student dropdown
+        if (document.getElementById('id_student')) {
+            new TomSelect('#id_student', {
+                create: false,
+                maxOptions: 1000,
+                placeholder: '🔍 វាយអត្តលេខ, ឈ្មោះខ្មែរ ឬអង់គ្លេស...',
+                allowEmptyOption: true,
+                sortField: { field: 'text', direction: 'asc' },
+                render: {
+                    no_results: function (data, escape) {
+                        return '<div class="no-results">⚠️ រកមិនឃើញនិស្សិតឈ្មោះ "' + escape(data.input) + '" ឡើយ</div>';
+                    }
+                }
+            });
+        }
+
+        // Searchable Course dropdown
+        if (document.getElementById('id_course')) {
+            new TomSelect('#id_course', {
+                create: false,
+                maxOptions: 500,
+                placeholder: '🔍 វាយកូដមុខវិជ្ជា, ឈ្មោះមុខវិជ្ជា ឬសាស្រ្តាចារ្យ...',
+                allowEmptyOption: true,
+                sortField: { field: 'text', direction: 'asc' },
+                render: {
+                    no_results: function (data, escape) {
+                        return '<div class="no-results">⚠️ រកមិនឃើញមុខវិជ្ជា "' + escape(data.input) + '" ឡើយ</div>';
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

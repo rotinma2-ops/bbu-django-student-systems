@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.code }} · {{ course.title }}{% endblock %}
+{% block topbar_title %}Course detail{% endblock %}
+
+{% block content %}
+<ol class="crumbs" aria-label="breadcrumb">
+    <li><a href="{% url 'home' %}">Home</a></li>
+    <li><a href="{% url 'courses:course_list' %}">Courses</a></li>
+    <li aria-current="page">{{ course.code }}</li>
+</ol>
+
+<section class="banner rise">
+    <div class="banner-inner">
+        <div>
+            <span class="eyebrow" style="color:var(--gold-2)">{{ course.code }}</span>
+            <h1>{{ course.title }}</h1>
+            <div class="sub">{{ course.instructor.get_full_name }}</div>
+            <div class="badges">
+                <span class="badge plain b-gray">{{ course.get_level_display }}</span>
+                {% if course.status == 'ACTIVE' %}<span class="badge b-green">Active</span>
+                {% elif course.status == 'INACTIVE' %}<span class="badge b-amber">Inactive</span>
+                {% else %}<span class="badge b-gray">Archived</span>{% endif %}
+            </div>
+        </div>
+        <div class="banner-stats">
+            <div class="banner-stat"><b>{{ course.credits }}</b><span>Credits</span></div>
+            <div class="banner-stat"><b>{{ course.capacity }}</b><span>Capacity</span></div>
+        </div>
+    </div>
+</section>
+
+<div class="split">
+    <div class="stack">
+        <div class="card rise rise-1">
+            <div class="card-head"><h2>Course Information</h2></div>
+            <div class="card-body">
+                <dl class="kv">
+                    <div><dt>Code</dt><dd>{{ course.code }}</dd></div>
+                    <div><dt>Title</dt><dd>{{ course.title }}</dd></div>
+                    <div class="wide"><dt>Description</dt><dd style="font-weight:500;color:var(--text)">{{ course.description }}</dd></div>
+                    <div><dt>Instructor</dt><dd>{{ course.instructor.get_full_name }}</dd></div>
+                    <div><dt>Credits</dt><dd>{{ course.credits }}</dd></div>
+                    <div><dt>Level</dt><dd>{{ course.get_level_display }}</dd></div>
+                    <div><dt>Capacity</dt><dd>{{ course.capacity }} students</dd></div>
+                    <div><dt>Status</dt><dd>
+                        {% if course.status == 'ACTIVE' %}<span class="badge b-green">Active</span>
+                        {% elif course.status == 'INACTIVE' %}<span class="badge b-amber">Inactive</span>
+                        {% else %}<span class="badge b-gray">Archived</span>{% endif %}
+                    </dd></div>
+                    <div><dt>Start Date</dt><dd>{{ course.start_date }}</dd></div>
+                    <div><dt>End Date</dt><dd>{{ course.end_date }}</dd></div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Enrolled students (staff only) -->
+        {% if user.is_staff %}
+        <div class="card rise rise-2">
+            <div class="card-head">
+                <h2>Enrolled Students</h2>
+                <span class="badge plain b-gold">{{ course.enrollments.count }}</span>
+            </div>
+            {% if course.enrollments.all %}
+            <div class="tbl-wrap">
+                <table class="tbl">
+                    <thead>
+                        <tr><th>Student ID</th><th>ឈ្មោះនិស្សិត (Student Name)</th><th>Score</th><th>Grade</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for enrollment in course.enrollments.all %}
+                        <tr>
+                            <td><a href="{% url 'students:student_detail' enrollment.student.pk %}" class="code">{{ enrollment.student.student_id }}</a></td>
+                            <td>
+                                <span class="strong">{{ enrollment.student.khmer_name|default:enrollment.student.user.get_full_name }}</span>
+                                {% if enrollment.student.khmer_name and enrollment.student.user.get_full_name %}
+                                <span class="text-muted small">({{ enrollment.student.user.get_full_name }})</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ enrollment.score|default:"N/A" }}</td>
+                            <td>{{ enrollment.grade|default:"N/A" }}</td>
+                            <td><span class="badge b-gray">{{ enrollment.get_status_display }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty"><svg class="ic"><use href="#i-inbox"/></svg><h3>No students enrolled yet</h3></div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <aside class="card rise rise-3">
+        <div class="card-head"><h3>Actions</h3></div>
+        <div class="card-body stack" style="gap:10px">
+            {% if user.is_staff %}
+            <a href="{% url 'courses:course_update' course.id %}" class="btn btn-primary btn-block"><svg class="ic"><use href="#i-edit"/></svg> Edit</a>
+            <a href="{% url 'courses:course_delete' course.id %}" class="btn btn-ghost btn-block" style="color:var(--red);border-color:#e9bcb7"><svg class="ic"><use href="#i-trash"/></svg> Delete</a>
+            {% endif %}
+            <a href="{% url 'courses:course_list' %}" class="btn btn-ghost btn-block"><svg class="ic"><use href="#i-arrow-left"/></svg> Back to List</a>
+        </div>
+    </aside>
+</div>
+{% endblock %}

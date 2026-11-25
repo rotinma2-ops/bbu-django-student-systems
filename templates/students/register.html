@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Student Registration{% endblock %}
+{% block topbar_title %}Registration{% endblock %}
+
+{% block content %}
+<div style="max-width:960px;margin:0 auto">
+
+    <section class="banner rise" style="text-align:center">
+        <div style="position:relative;z-index:1">
+            <span class="eyebrow" style="color:var(--gold-2)">Build Bright University</span>
+            <h1>🎓 Student Registration</h1>
+            <p class="sub" style="max-width:56ch;margin:10px auto 0">Create your student account to access courses, track grades, and view transcripts</p>
+        </div>
+    </section>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            <svg class="ic"><use href="#i-alert"/></svg>
+            <div>
+                <strong>Please correct the following errors:</strong>
+                <ul>{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="stack">
+
+            <!-- Step 1 -->
+            <div class="card rise rise-1">
+                <div class="card-head"><h2><span class="num">1</span> Step 1: Account Credentials</h2><svg class="ic ic-lg text-faint"><use href="#i-lock"/></svg></div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="field {% if form.username.errors %}has-error{% endif %}">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">Username <span class="req">*</span></label>
+                            {{ form.username }}
+                            {% if form.username.help_text %}<small class="help">{{ form.username.help_text|safe }}</small>{% endif %}
+                            {% if form.username.errors %}<div class="invalid-feedback">{{ form.username.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="field {% if form.email.errors %}has-error{% endif %}">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">Email Address <span class="req">*</span></label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<div class="invalid-feedback">{{ form.email.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="field {% if form.password1.errors %}has-error{% endif %}">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label">Password <span class="req">*</span></label>
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}<div class="invalid-feedback">{{ form.password1.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="field {% if form.password2.errors %}has-error{% endif %}">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm Password <span class="req">*</span></label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}<div class="invalid-feedback">{{ form.password2.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="card rise rise-2">
+                <div class="card-head"><h2><span class="num">2</span> Step 2: Student Profile &amp; Personal Details</h2><svg class="ic ic-lg text-faint"><use href="#i-cap"/></svg></div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="field {% if form.student_id.errors %}has-error{% endif %}">
+                            <label for="{{ form.student_id.id_for_label }}" class="form-label">Student ID <span class="req">*</span></label>
+                            {{ form.student_id }}
+                            {% if form.student_id.errors %}<div class="invalid-feedback">{{ form.student_id.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="field {% if form.khmer_name.errors %}has-error{% endif %}">
+                            <label for="{{ form.khmer_name.id_for_label }}" class="form-label" style="color:var(--gold)">ឈ្មោះខ្មែរ (Khmer Name - Primary)</label>
+                            {{ form.khmer_name }}
+                            {% if form.khmer_name.errors %}<div class="invalid-feedback">{{ form.khmer_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="field {% if form.first_name.errors %}has-error{% endif %}">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name (Latin) <span class="req">*</span></label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}<div class="invalid-feedback">{{ form.first_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="field {% if form.last_name.errors %}has-error{% endif %}">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name (Latin) <span class="req">*</span></label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}<div class="invalid-feedback">{{ form.last_name.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-grid form-grid-3" style="margin-top:20px">
+                        <div class="field {% if form.date_of_birth.errors %}has-error{% endif %}">
+                            <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">Date of Birth <span class="req">*</span></label>
+                            {{ form.date_of_birth }}
+                            {% if form.date_of_birth.errors %}<div class="invalid-feedback">{{ form.date_of_birth.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="field {% if form.gender.errors %}has-error{% endif %}">
+                            <label for="{{ form.gender.id_for_label }}" class="form-label">Gender <span class="req">*</span></label>
+                            {{ form.gender }}
+                            {% if form.gender.errors %}<div class="invalid-feedback">{{ form.gender.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="field {% if form.phone_number.errors %}has-error{% endif %}">
+                            <label for="{{ form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
+                            {{ form.phone_number }}
+                            {% if form.phone_number.errors %}<div class="invalid-feedback">{{ form.phone_number.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-grid" style="margin-top:20px">
+                        <div class="field full {% if form.address.errors %}has-error{% endif %}">
+                            <label for="{{ form.address.id_for_label }}" class="form-label">Street Address <span class="req">*</span></label>
+                            {{ form.address }}
+                            {% if form.address.errors %}<div class="invalid-feedback">{{ form.address.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="field {% if form.city.errors %}has-error{% endif %}">
+                            <label for="{{ form.city.id_for_label }}" class="form-label">City <span class="req">*</span></label>
+                            {{ form.city }}
+                            {% if form.city.errors %}<div class="invalid-feedback">{{ form.city.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="field {% if form.country.errors %}has-error{% endif %}">
+                            <label for="{{ form.country.id_for_label }}" class="form-label">Country <span class="req">*</span></label>
+                            {{ form.country }}
+                            {% if form.country.errors %}<div class="invalid-feedback">{{ form.country.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-gold btn-lg btn-block">
+                <svg class="ic"><use href="#i-cap"/></svg> Complete Student Registration
+            </button>
+
+            <p class="text-center text-muted" style="margin:0">
+                Already registered as a student?
+                <a href="{% url 'login' %}" class="fw-bold"><svg class="ic"><use href="#i-login"/></svg> Log in here</a>
+            </p>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}{{ student.student_id }} · Student Profile{% endblock %}
+{% block topbar_title %}Student profile{% endblock %}
+
+{% block content %}
+<ol class="crumbs" aria-label="breadcrumb">
+    <li><a href="{% url 'home' %}">Home</a></li>
+    {% if user.is_staff %}
+    <li><a href="{% url 'students:student_list' %}">Students</a></li>
+    {% endif %}
+    <li aria-current="page">{{ student.student_id }}</li>
+</ol>
+
+<!-- Profile banner -->
+<section class="banner rise">
+    <div class="banner-inner">
+        <span class="avatar avatar-xl">
+            {% if student.profile_picture %}
+                <img src="{{ student.profile_picture.url }}" alt="{{ student.get_primary_name }}">
+            {% elif student.khmer_name %}{{ student.khmer_name|slice:":1" }}
+            {% elif student.user.first_name %}{{ student.user.first_name|slice:":1" }}
+            {% else %}<svg class="ic ic-xl"><use href="#i-user"/></svg>{% endif %}
+        </span>
+        <div>
+            <h1>{{ student.khmer_name|default:student.user.get_full_name }}</h1>
+            {% if student.khmer_name and student.user.get_full_name %}
+            <div class="sub">{{ student.user.get_full_name }}</div>
+            {% endif %}
+            <div class="badges">
+                <span class="badge plain b-gray">ID: {{ student.student_id }}</span>
+                {% if student.is_active %}<span class="badge b-green">Active</span>{% else %}<span class="badge b-gray">Inactive</span>{% endif %}
+            </div>
+        </div>
+        <div class="banner-stats">
+            <div class="banner-stat"><b>{{ student.gpa }}</b><span>GPA</span></div>
+            <div class="banner-stat"><b>{{ student.enrollments.count }}</b><span>Courses</span></div>
+        </div>
+    </div>
+</section>
+
+<div class="split">
+    <div class="stack">
+        <!-- Personal details -->
+        <div class="card rise rise-1">
+            <div class="card-head"><h2>Personal details</h2></div>
+            <div class="card-body">
+                <dl class="kv">
+                    <div><dt>Khmer Name</dt><dd>{{ student.khmer_name|default:"—" }}</dd></div>
+                    <div><dt>English Name</dt><dd>{{ student.user.get_full_name|default:student.user.username }}</dd></div>
+                    <div><dt>Student ID</dt><dd>{{ student.student_id }}</dd></div>
+                    <div><dt>Email</dt><dd>{{ student.user.email }}</dd></div>
+                    <div><dt>Phone</dt><dd>{{ student.phone_number|default:"—" }}</dd></div>
+                    <div><dt>Gender</dt><dd>{{ student.get_gender_display }}</dd></div>
+                    <div><dt>Date of Birth</dt><dd>{{ student.date_of_birth }}</dd></div>
+                    <div><dt>Enrollment Date</dt><dd>{{ student.enrollment_date|date:"Y-m-d" }}</dd></div>
+                    <div class="wide"><dt>Address</dt><dd>{{ student.address }}</dd></div>
+                    <div><dt>City</dt><dd>{{ student.city }}</dd></div>
+                    <div><dt>Country</dt><dd>{{ student.country }}</dd></div>
+                    <div><dt>GPA</dt><dd><span class="badge plain b-gold">{{ student.gpa }}</span></dd></div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Enrollments -->
+        <div class="card rise rise-2">
+            <div class="card-head"><h2>Enrollments</h2></div>
+            {% if student.enrollments.all %}
+            <div class="tbl-wrap">
+                <table class="tbl">
+                    <thead>
+                        <tr><th>Course Code &amp; Title</th><th>Score</th><th>Grade</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for enrollment in student.enrollments.all %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'courses:course_detail' enrollment.course.pk %}" class="strong">
+                                    <span class="code">{{ enrollment.course.code }}</span> &nbsp;{{ enrollment.course.title }}
+                                </a>
+                            </td>
+                            <td>{{ enrollment.score|default:"—" }}</td>
+                            <td>{% if enrollment.grade %}<span class="badge plain b-blue">{{ enrollment.grade }}</span>{% else %}<span class="text-faint">—</span>{% endif %}</td>
+                            <td><span class="badge b-gray">{{ enrollment.get_status_display }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty"><svg class="ic"><use href="#i-inbox"/></svg><h3>No enrollments yet</h3></div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <aside class="card rise rise-3">
+        <div class="card-head"><h3>Actions</h3></div>
+        <div class="card-body stack" style="gap:10px">
+            <a href="{% url 'enrollments:student_transcript' student.student_id %}" class="btn btn-primary btn-block">
+                <svg class="ic"><use href="#i-file"/></svg> View Transcript
+            </a>
+            {% if user.is_staff or user == student.user %}
+            <a href="{% url 'students:student_update' student.id %}" class="btn btn-soft btn-block">
+                <svg class="ic"><use href="#i-edit"/></svg> Edit Profile
+            </a>
+            {% endif %}
+            {% if user.is_staff %}
+            <a href="{% url 'students:student_delete' student.id %}" class="btn btn-ghost btn-block" style="color:var(--red);border-color:#e9bcb7">
+                <svg class="ic"><use href="#i-trash"/></svg> Delete Student
+            </a>
+            <a href="{% url 'students:student_list' %}" class="btn btn-ghost btn-block">
+                <svg class="ic"><use href="#i-arrow-left"/></svg> Back to List
+            </a>
+            {% else %}
+            <a href="{% url 'home' %}" class="btn btn-ghost btn-block">
+                <svg class="ic"><use href="#i-home"/></svg> Back to Home
+            </a>
+            {% endif %}
+        </div>
+    </aside>
+</div>
+{% endblock %}

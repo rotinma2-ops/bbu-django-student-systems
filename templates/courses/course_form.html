@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit Course{% else %}Add New Course{% endif %}{% endblock %}
+{% block topbar_title %}{% if form.instance.pk %}Edit course{% else %}New course{% endif %}{% endblock %}
+
+{% block content %}
+<ol class="crumbs" aria-label="breadcrumb">
+    <li><a href="{% url 'home' %}">Home</a></li>
+    <li><a href="{% url 'courses:course_list' %}">Courses</a></li>
+    <li aria-current="page">{% if form.instance.pk %}Edit{% else %}Add New{% endif %}</li>
+</ol>
+
+<div class="page-head rise">
+    <div>
+        <span class="eyebrow">{% if form.instance.pk %}Edit record{% else %}New record{% endif %}</span>
+        <h1>{% if form.instance.pk %}Edit Course{% else %}Add New Course{% endif %}</h1>
+    </div>
+</div>
+
+<form method="post" novalidate style="max-width:860px">
+    {% csrf_token %}
+
+    <div class="card rise rise-1">
+        <div class="card-head"><h2>Course details</h2></div>
+        <div class="card-body">
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger"><svg class="ic"><use href="#i-alert"/></svg><div>{{ form.non_field_errors }}</div></div>
+            {% endif %}
+
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="field {% if field.name == 'description' or field.name == 'title' %}full{% endif %} {% if field.errors %}has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<div class="invalid-feedback">{{ field.errors.0 }}</div>{% endif %}
+                    {% if field.help_text %}<small class="help">{{ field.help_text|safe }}</small>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row-gap mt-2">
+        <button type="submit" class="btn btn-primary btn-lg"><svg class="ic"><use href="#i-save"/></svg> Save</button>
+        <a href="{% url 'courses:course_list' %}" class="btn btn-ghost btn-lg"><svg class="ic"><use href="#i-x"/></svg> Cancel</a>
+    </div>
+</form>
+{% endblock %}

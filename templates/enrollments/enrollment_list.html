@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Enrollments{% endblock %}
+{% block topbar_title %}Enrollments{% endblock %}
+
+{% block content %}
+<div class="page-head rise">
+    <div>
+        <span class="eyebrow">Registrar</span>
+        <h1>Enrollments<small>ការចុះឈ្មោះ · Who is taking what, with scores and grades</small></h1>
+    </div>
+    <div class="page-actions">
+        <a href="{% url 'enrollments:enrollment_create' %}" class="btn btn-gold">
+            <svg class="ic"><use href="#i-plus"/></svg> Add New Enrollment
+        </a>
+    </div>
+</div>
+
+<div class="card rise rise-1">
+    <!-- Search form -->
+    <form method="get" class="toolbar">
+        <div class="search">
+            <svg class="ic"><use href="#i-search"/></svg>
+            <input type="text" name="search" class="form-control" placeholder="Search by student ID or course code" value="{{ request.GET.search }}">
+        </div>
+        <select name="status" class="form-select" style="width:auto;min-width:170px">
+            <option value="">All Status</option>
+            <option value="ENROLLED" {% if request.GET.status == 'ENROLLED' %}selected{% endif %}>Enrolled</option>
+            <option value="COMPLETED" {% if request.GET.status == 'COMPLETED' %}selected{% endif %}>Completed</option>
+            <option value="DROPPED" {% if request.GET.status == 'DROPPED' %}selected{% endif %}>Dropped</option>
+        </select>
+        <button type="submit" class="btn btn-primary"><svg class="ic"><use href="#i-search"/></svg> Search</button>
+    </form>
+
+    {% if enrollments %}
+    <div class="tbl-wrap">
+        <table class="tbl">
+            <thead>
+                <tr>
+                    <th>Student</th><th>Course</th><th class="c">Score</th><th class="c">Grade</th><th class="c">Status</th><th>Enrolled</th><th class="r">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for enrollment in enrollments %}
+                <tr>
+                    <td>
+                        <div class="strong">{{ enrollment.student.khmer_name|default:enrollment.student.user.get_full_name }}</div>
+                        {% if enrollment.student.khmer_name and enrollment.student.user.get_full_name %}
+                        <div class="person-sub">{{ enrollment.student.user.get_full_name }}</div>
+                        {% endif %}
+                    </td>
+                    <td><span class="code">{{ enrollment.course.code }}</span></td>
+                    <td class="c">{{ enrollment.score|default:"N/A" }}</td>
+                    <td class="c">{{ enrollment.grade|default:"N/A" }}</td>
+                    <td class="c">
+                        {% if enrollment.status == 'ENROLLED' %}<span class="badge b-blue">Enrolled</span>
+                        {% elif enrollment.status == 'COMPLETED' %}<span class="badge b-green">Completed</span>
+                        {% elif enrollment.status == 'DROPPED' %}<span class="badge b-red">Dropped</span>
+                        {% else %}<span class="badge b-amber">Suspended</span>{% endif %}
+                    </td>
+                    <td class="text-muted nowrap">{{ enrollment.enrollment_date|date:"Y-m-d" }}</td>
+                    <td class="r nowrap">
+                        <span class="acts">
+                            <a href="{% url 'enrollments:enrollment_detail' enrollment.id %}" class="act act-view" title="View" aria-label="View"><svg class="ic"><use href="#i-eye"/></svg></a>
+                            <a href="{% url 'enrollments:add_grade' enrollment.id %}" class="act act-grade" title="Add Grade" aria-label="Add Grade"><svg class="ic"><use href="#i-edit"/></svg></a>
+                            <a href="{% url 'enrollments:enrollment_delete' enrollment.id %}" class="act act-del" title="Delete" aria-label="Delete"><svg class="ic"><use href="#i-trash"/></svg></a>
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <nav class="pager" aria-label="Page navigation">
+        <span class="pager-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        <div class="pager-links">
+            {% if page_obj.has_previous %}
+            <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status|urlencode }}{% endif %}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status|urlencode }}{% endif %}">Previous</a>
+            {% endif %}
+            <span class="is-current">{{ page_obj.number }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status|urlencode }}{% endif %}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status|urlencode }}{% endif %}">Last</a>
+            {% endif %}
+        </div>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="empty">
+        <svg class="ic"><use href="#i-inbox"/></svg>
+        <h3>No enrollments found</h3>
+        <p>Try a different search or status filter.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

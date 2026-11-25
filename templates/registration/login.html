@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block shell %}
+<div class="auth">
+
+    <!-- Brand panel -->
+    <section class="auth-art">
+        <a class="brand" href="{% url 'home' %}">
+            <span class="brand-mark">B</span>
+            <span class="brand-text"><strong>Build Bright</strong><span>University · SMS</span></span>
+        </a>
+
+        <div>
+            <span class="eyebrow" style="color:var(--gold-2)">ចូលប្រើប្រព័ន្ធ</span>
+            <h2>Learning, <em>beautifully</em> organised.</h2>
+            <p class="mt-2">ចូលប្រើប្រព័ន្ធគ្រប់គ្រងសិស្ស BBU — manage students, courses, enrollments and transcripts from one calm, secure place.</p>
+        </div>
+
+        <div class="auth-quote">
+            <div><b>3</b><span>Access roles</span></div>
+            <div><b>RBAC</b><span>Protected data</span></div>
+            <div><b>KH · EN</b><span>Bilingual</span></div>
+        </div>
+    </section>
+
+    <!-- Form panel -->
+    <section class="auth-panel">
+        <div class="auth-box rise">
+            <span class="eyebrow">Account Login</span>
+            <h1>Welcome back</h1>
+            <p class="lead">Sign in to continue to your BBU dashboard.</p>
+
+            {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                <svg class="ic"><use href="#i-alert"/></svg>
+                <div>Invalid username or password. Please try again.</div>
+            </div>
+            {% endif %}
+
+            {% if next %}
+                {% if user.is_authenticated %}
+                <div class="alert alert-warning" role="alert">
+                    <svg class="ic"><use href="#i-lock"/></svg>
+                    <div>Your account doesn't have access to this page. Please login with an authorized account.</div>
+                </div>
+                {% else %}
+                <div class="alert alert-info" role="alert">
+                    <svg class="ic"><use href="#i-info"/></svg>
+                    <div>Please log in to view this page.</div>
+                </div>
+                {% endif %}
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}" id="loginForm">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+
+                <div class="field" style="margin-bottom:18px">
+                    <label for="id_username" class="form-label">Username</label>
+                    <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username" class="form-control" placeholder="Enter username">
+                </div>
+
+                <div class="field" style="margin-bottom:26px">
+                    <label for="id_password" class="form-label">Password</label>
+                    <input type="password" name="password" autocomplete="current-password" required id="id_password" class="form-control" placeholder="Enter password">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    <svg class="ic"><use href="#i-login"/></svg> Login
+                </button>
+            </form>
+
+            <p class="text-center text-muted small mt-2" style="margin-bottom:0">
+                Don't have an account?
+                <a href="{% url 'students:register' %}" class="fw-bold">Register as a Student</a>
+            </p>
+
+            <!-- Demo accounts helper -->
+            <div class="demo-box">
+                <div class="demo-head">
+                    <span><svg class="ic" style="color:var(--gold)"><use href="#i-key"/></svg> គណនីសាកល្បង (Demo Accounts)</span>
+                    <span class="badge b-gray plain">Click to fill</span>
+                </div>
+
+                <div class="demo-row">
+                    <div>
+                        <span class="badge b-gold">Admin</span>
+                        <code>admin</code> / <code>admin123456</code>
+                        <div class="meta">Full access (Django Admin + System)</div>
+                    </div>
+                    <button type="button" class="btn btn-ghost btn-sm" data-fill-user="admin" data-fill-pass="admin123456">Fill</button>
+                </div>
+
+                <div class="demo-row">
+                    <div>
+                        <span class="badge b-blue">Teacher</span>
+                        <code>teacher</code> / <code>teacher123456</code>
+                        <div class="meta">Manage all students &amp; enrollments</div>
+                    </div>
+                    <button type="button" class="btn btn-ghost btn-sm" data-fill-user="teacher" data-fill-pass="teacher123456">Fill</button>
+                </div>
+
+                <div class="demo-row">
+                    <div>
+                        <span class="badge b-green">Student</span>
+                        <code>student</code> / <code>student123456</code>
+                        <div class="meta">Strictly isolated to own profile</div>
+                    </div>
+                    <button type="button" class="btn btn-ghost btn-sm" data-fill-user="student" data-fill-pass="student123456">Fill</button>
+                </div>
+            </div>
+
+            <p class="text-center mt-2" style="margin-bottom:0">
+                <a href="{% url 'home' %}" class="small text-muted"><svg class="ic"><use href="#i-arrow-left"/></svg> Back to home</a>
+            </p>
+        </div>
+    </section>
+</div>
+{% endblock %}

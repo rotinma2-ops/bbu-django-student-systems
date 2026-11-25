@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "student_system/wsgi.py": {
+      "maxDuration": 60,
+      "excludeFiles": "{venv/**,.venv/**,.git/**,lessons/**,development_plan/**,scripts/**,staticfiles/**,**/__pycache__/**}"
+    }
+  }
+}

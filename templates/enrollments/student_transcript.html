@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Transcript · {{ student.student_id }}{% endblock %}
+{% block topbar_title %}Academic transcript{% endblock %}
+
+{% block content %}
+<ol class="crumbs" aria-label="breadcrumb">
+    <li><a href="{% url 'home' %}">Home</a></li>
+    <li><a href="{% url 'students:student_detail' student.id %}">{{ student.student_id }}</a></li>
+    <li aria-current="page">Transcript</li>
+</ol>
+
+<div class="sheet rise">
+    <div class="sheet-head">
+        <div class="seal">B</div>
+        <h1>Build Bright University</h1>
+        <p>Student Academic Transcript · ព្រឹត្តិបត្រពិន្ទុ</p>
+    </div>
+
+    <div class="sheet-body">
+        <div class="sheet-id">
+            <div>
+                <h2>{{ student.khmer_name|default:student.user.get_full_name }}</h2>
+                {% if student.khmer_name and student.user.get_full_name %}
+                <div class="text-muted" style="font-size:17px">{{ student.user.get_full_name }}</div>
+                {% endif %}
+            </div>
+            <span class="badge plain b-gold">ID: {{ student.student_id }}</span>
+        </div>
+
+        <!-- Academic summary -->
+        <div class="metrics" style="margin-bottom:28px">
+            <div class="metric gold"><span>Cumulative GPA</span><b>{{ student.gpa }}</b></div>
+            <div class="metric"><span>Total Courses</span><b>{{ enrollments.count }}</b></div>
+            <div class="metric {% if student.is_active %}green{% endif %}"><span>Status</span>
+                <b style="font-size:26px;padding-top:10px">{% if student.is_active %}Active{% else %}Inactive{% endif %}</b>
+            </div>
+        </div>
+
+        <!-- Transcript table -->
+        <div class="card" style="box-shadow:none">
+            <div class="tbl-wrap">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>Course Code</th><th>Course Title</th><th class="c">Credits</th><th class="c">Score</th><th class="c">Grade</th><th class="c">Status</th><th>Semester</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for enrollment in enrollments %}
+                        <tr>
+                            <td><span class="code">{{ enrollment.course.code }}</span></td>
+                            <td class="strong">{{ enrollment.course.title }}</td>
+                            <td class="c">{{ enrollment.course.credits }}</td>
+                            <td class="c">{% if enrollment.score %}<span class="badge plain b-amber">{{ enrollment.score }}</span>{% else %}<span class="text-faint">N/A</span>{% endif %}</td>
+                            <td class="c">{% if enrollment.grade %}<span class="badge plain b-green">{{ enrollment.grade }}</span>{% else %}<span class="text-faint">N/A</span>{% endif %}</td>
+                            <td class="c">
+                                {% if enrollment.status == 'COMPLETED' %}<span class="badge b-green">Completed</span>
+                                {% elif enrollment.status == 'ENROLLED' %}<span class="badge b-blue">Enrolled</span>
+                                {% elif enrollment.status == 'DROPPED' %}<span class="badge b-red">Dropped</span>
+                                {% else %}<span class="badge b-amber">Suspended</span>{% endif %}
+                            </td>
+                            <td class="text-muted nowrap">{{ enrollment.enrollment_date|date:"Y-m" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="7" class="text-center text-muted" style="padding:36px">No courses taken yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="sheet-foot">
+        <span><b>Transcript Generated:</b> {{ "now"|date:"Y-m-d H:i" }}</span>
+        <span><b>Student Email:</b> {{ student.user.email }}</span>
+        <span><b>Enrollment Date:</b> {{ student.enrollment_date|date:"Y-m-d" }}</span>
+    </div>
+</div>
+
+<div class="row-gap mt-2 no-print">
+    <a href="{% url 'students:student_detail' student.id %}" class="btn btn-ghost"><svg class="ic"><use href="#i-arrow-left"/></svg> Back to Student Profile</a>
+    <button type="button" onclick="window.print()" class="btn btn-primary"><svg class="ic"><use href="#i-printer"/></svg> Print Transcript</button>
+</div>
+{% endblock %}

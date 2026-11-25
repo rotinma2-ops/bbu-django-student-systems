@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+{% block topbar_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- ===== Hero ===== -->
+<section class="hero rise">
+    <div>
+        <span class="eyebrow">Build Bright University</span>
+        <h1>ប្រព័ន្ធគ្រប់គ្រង<em>និស្សិត</em></h1>
+        <p class="lead">Student Management System by Build Bright University. ស្វាគមន៍ដល់ប្រព័ន្ធគ្រប់គ្រងនិស្សិតដែលប្រើ Django Framework។</p>
+        <div class="cta">
+            {% if user.is_authenticated %}
+                {% if not user.is_staff and user.student %}
+                <a href="{% url 'students:student_detail' user.student.pk %}" class="btn btn-gold btn-lg">
+                    <svg class="ic"><use href="#i-user"/></svg> មើលប្រវត្តិរូបខ្ញុំ
+                </a>
+                {% else %}
+                <a href="{% url 'students:student_list' %}" class="btn btn-gold btn-lg">
+                    <svg class="ic"><use href="#i-users"/></svg> Students Directory
+                </a>
+                {% endif %}
+                <a href="{% url 'courses:course_list' %}" class="btn btn-outline-light btn-lg">
+                    <svg class="ic"><use href="#i-book"/></svg> Browse Courses
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-gold btn-lg">
+                    <svg class="ic"><use href="#i-login"/></svg> Login
+                </a>
+                <a href="{% url 'students:register' %}" class="btn btn-outline-light btn-lg">
+                    <svg class="ic"><use href="#i-cap"/></svg> Register as Student
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="glass">
+        <h3><svg class="ic"><use href="#i-award"/></svg> At a glance · ស្ថានភាព</h3>
+        <div class="glass-row"><span>សិស្សដែលសកម្ម · Active students</span><b>{{ active_students }}</b></div>
+        <div class="glass-row"><span>វគ្គដែលសកម្ម · Active courses</span><b>{{ active_courses }}</b></div>
+        <div class="glass-row"><span>ការចុះឈ្មោះ · Enrollments</span><b>{{ total_enrollments }}</b></div>
+    </div>
+</section>
+
+<!-- ===== Stat tiles ===== -->
+<section class="grid g-4 mt-3">
+    <div class="stat tone-blue rise rise-1">
+        <div class="stat-ic"><svg class="ic"><use href="#i-users"/></svg></div>
+        <div class="stat-label">👥 សិស្ស · សិស្សសរុប</div>
+        <div class="stat-num">{{ total_students }}</div>
+        {% if user.is_authenticated and not user.is_staff and user.student %}
+        <a href="{% url 'students:student_detail' user.student.pk %}" class="stat-link">មើលប្រវត្តិរូបខ្ញុំ <svg class="ic"><use href="#i-arrow-right"/></svg></a>
+        {% else %}
+        <a href="{% url 'students:student_list' %}" class="stat-link">មើលលម្អិត <svg class="ic"><use href="#i-arrow-right"/></svg></a>
+        {% endif %}
+    </div>
+
+    <div class="stat tone-green rise rise-2">
+        <div class="stat-ic"><svg class="ic"><use href="#i-book"/></svg></div>
+        <div class="stat-label">📖 វគ្គ · វគ្គសរុប</div>
+        <div class="stat-num">{{ total_courses }}</div>
+        <a href="{% url 'courses:course_list' %}" class="stat-link">មើលលម្អិត <svg class="ic"><use href="#i-arrow-right"/></svg></a>
+    </div>
+
+    <div class="stat rise rise-3">
+        <div class="stat-ic"><svg class="ic"><use href="#i-clipboard"/></svg></div>
+        <div class="stat-label">✍️ ការចុះឈ្មោះ · ការចុះឈ្មោះសរុប</div>
+        <div class="stat-num">{{ total_enrollments }}</div>
+        <a href="{% url 'enrollments:enrollment_list' %}" class="stat-link">មើលលម្អិត <svg class="ic"><use href="#i-arrow-right"/></svg></a>
+    </div>
+
+    <div class="stat tone-amber rise rise-4">
+        <div class="stat-ic"><svg class="ic"><use href="#i-settings"/></svg></div>
+        <div class="stat-label">⚙️ Admin · ផ្ទាំងគ្រប់គ្រង</div>
+        <div class="stat-num icon-num">Control</div>
+        <a href="/admin/" class="stat-link">ចូលគ្រប់គ្រង <svg class="ic"><use href="#i-arrow-right"/></svg></a>
+    </div>
+</section>
+
+<!-- ===== Demo test accounts (3 roles) ===== -->
+<section class="mt-4">
+    <div class="page-head" style="margin-bottom:22px">
+        <div>
+            <span class="eyebrow">Role-Based Access Control</span>
+            <h2 class="section-title">គណនីសាកល្បងតាមតួនាទីទាំង ៣</h2>
+            <p class="section-sub" style="margin:0">Demo Test Accounts for All 3 Roles — សាកល្បងសិទ្ធិប្រើប្រាស់ និងប្រព័ន្ធការពារសុវត្ថិភាពរវាង Admin, Teacher, និង Student។</p>
+        </div>
+        <span class="badge b-ink plain">BBU RBAC System</span>
+    </div>
+
+    <div class="grid g-3">
+        {% for acc in test_accounts %}
+        <article class="pass role-{{ acc.role_key }} rise rise-{{ forloop.counter }}">
+            <div class="pass-body">
+                <div class="pass-top">
+                    <span class="pass-ic">
+                        {% if acc.role_key == 'admin' %}<svg class="ic"><use href="#i-shield"/></svg>
+                        {% elif acc.role_key == 'teacher' %}<svg class="ic"><use href="#i-award"/></svg>
+                        {% else %}<svg class="ic"><use href="#i-cap"/></svg>{% endif %}
+                    </span>
+                    <span class="badge {% if acc.role_key == 'admin' %}b-gold{% elif acc.role_key == 'teacher' %}b-blue{% else %}b-green{% endif %}">{{ acc.badge }}</span>
+                </div>
+
+                <h3>{{ acc.role_title }}</h3>
+                <p class="desc">{{ acc.description }}</p>
+
+                <div class="cred">
+                    <div class="cred-row">
+                        <div><small>Username</small><code>{{ acc.username }}</code></div>
+                        <button type="button" class="copy-btn" data-copy="{{ acc.username }}" title="Copy username">
+                            <svg class="ic"><use href="#i-copy"/></svg><span class="copy-label">Copy</span>
+                        </button>
+                    </div>
+                    <div class="cred-row">
+                        <div><small>Password</small><code>{{ acc.password }}</code></div>
+                        <button type="button" class="copy-btn" data-copy="{{ acc.password }}" title="Copy password">
+                            <svg class="ic"><use href="#i-copy"/></svg><span class="copy-label">Copy</span>
+                        </button>
+                    </div>
+                </div>
+
+                <strong class="small text-muted" style="margin-bottom:10px;display:block">វិសាលភាពសិទ្ធិ (Access Scope)</strong>
+                <ul class="scope">
+                    {% for s in acc.scope %}
+                    <li><svg class="ic"><use href="#i-check-circle"/></svg><span>{{ s }}</span></li>
+                    {% endfor %}
+                </ul>
+
+                {% if user.is_authenticated and user.username == acc.username %}
+                <div class="pass-active"><svg class="ic"><use href="#i-check-circle"/></svg> កំពុង Login ជាមួយគណនីនេះ (Active)</div>
+                {% else %}
+                <a href="{{ acc.login_url }}" class="btn btn-primary btn-block">{{ acc.button_text }} <svg class="ic"><use href="#i-arrow-right"/></svg></a>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ===== Status + Getting started ===== -->
+<section class="split mt-4" style="grid-template-columns:minmax(0,340px) minmax(0,1fr)">
+    <div class="card">
+        <div class="card-head"><h3>📊 ស្ថានភាព</h3></div>
+        <div class="card-body">
+            <ul class="status-list">
+                <li>សិស្សដែលសកម្ម <b>{{ active_students }}</b></li>
+                <li>វគ្គដែលសកម្ម <b>{{ active_courses }}</b></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-head"><h3>🎯 ដូចម្តេច ចាប់ផ្តើម</h3></div>
+        <div class="card-body">
+            <p class="text-muted" style="margin-bottom:16px"><strong>ត្រើងយល់ដឹង ប្រព័ន្ធគ្រប់គ្រងនិស្សិត:</strong></p>
+            <ol class="steps">
+                <li>ចូលក្នុង Admin Panel សម្រាប់ management ពេញលេញ</li>
+                <li>ឆ្លើយ Students, Courses, Enrollments pages</li>
+                <li>សាកល្បង REST API នៅលើ /api/ URL</li>
+                <li>អានឯកសារលម្អិតក្នុងថត lessons/ (INSTRUCTIONS_KH.md) សម្រាប់ព័ត៌មានបន្ថែម</li>
+                <li>ធ្វើលំហាត់ក្នុងថត lessons/ (PRACTICE_EXERCISES_KH.md) ដើម្បីរៀនអនុវត្តជាក់ស្តែង</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<!-- ===== Useful links ===== -->
+<section class="mt-4 mb-2">
+    <h2 class="section-title">🔗 ឯកសារមានប្រយោជន៍</h2>
+    <p class="section-sub">Reference documentation for the technologies behind this system.</p>
+    <div class="linklist">
+        <a class="linkcard" href="https://docs.djangoproject.com/" target="_blank" rel="noopener">Django Documentation <svg class="ic"><use href="#i-external"/></svg></a>
+        <a class="linkcard" href="https://www.django-rest-framework.org/" target="_blank" rel="noopener">Django REST Framework <svg class="ic"><use href="#i-external"/></svg></a>
+        <a class="linkcard" href="https://getbootstrap.com/" target="_blank" rel="noopener">Bootstrap Documentation <svg class="ic"><use href="#i-external"/></svg></a>
+    </div>
+</section>
+{% endblock %}

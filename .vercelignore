@@ -1,0 +1,15 @@
+# Files that must NOT be uploaded to Vercel (keeps the function bundle small and secrets private)
+venv/
+.venv/
+env/
+.git/
+__pycache__/
+*.pyc
+staticfiles/
+development_plan/
+lessons/
+.env
+.env.local
+.env.*.local
+*.log
+.vercel/

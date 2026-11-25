@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Courses{% endblock %}
+{% block topbar_title %}Courses{% endblock %}
+
+{% block content %}
+<div class="page-head rise">
+    <div>
+        <span class="eyebrow">Catalogue</span>
+        <h1>Courses<small>វគ្គសិក្សា · Browse every course, instructor and credit load</small></h1>
+    </div>
+    <div class="page-actions">
+        {% if user.is_staff %}
+        <a href="{% url 'courses:course_create' %}" class="btn btn-gold">
+            <svg class="ic"><use href="#i-plus"/></svg> Add New Course
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card rise rise-1">
+    <!-- Search form -->
+    <form method="get" class="toolbar">
+        <div class="search">
+            <svg class="ic"><use href="#i-search"/></svg>
+            <input type="text" name="search" class="form-control" placeholder="Search by code or title" value="{{ request.GET.search }}">
+        </div>
+        <select name="status" class="form-select" style="width:auto;min-width:170px">
+            <option value="">All Status</option>
+            <option value="ACTIVE" {% if request.GET.status == 'ACTIVE' %}selected{% endif %}>Active</option>
+            <option value="INACTIVE" {% if request.GET.status == 'INACTIVE' %}selected{% endif %}>Inactive</option>
+        </select>
+        <button type="submit" class="btn btn-primary"><svg class="ic"><use href="#i-search"/></svg> Search</button>
+    </form>
+
+    {% if courses %}
+    <div class="tbl-wrap">
+        <table class="tbl">
+            <thead>
+                <tr>
+                    <th>Code</th><th>Title</th><th>Instructor</th><th class="c">Credits</th><th>Level</th><th class="c">Status</th><th class="r">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                <tr>
+                    <td><a href="{% url 'courses:course_detail' course.id %}" class="code">{{ course.code }}</a></td>
+                    <td class="strong">{{ course.title }}</td>
+                    <td class="text-muted">{{ course.instructor.get_full_name }}</td>
+                    <td class="c">{{ course.credits }}</td>
+                    <td>{{ course.get_level_display }}</td>
+                    <td class="c">
+                        {% if course.status == 'ACTIVE' %}<span class="badge b-green">Active</span>
+                        {% elif course.status == 'INACTIVE' %}<span class="badge b-amber">Inactive</span>
+                        {% else %}<span class="badge b-gray">Archived</span>{% endif %}
+                    </td>
+                    <td class="r nowrap">
+                        <span class="acts">
+                            <a href="{% url 'courses:course_detail' course.id %}" class="act act-view" title="View Details" aria-label="View Details"><svg class="ic"><use href="#i-eye"/></svg></a>
+                            {% if user.is_staff %}
+                            <a href="{% url 'courses:course_update' course.id %}" class="act act-edit" title="Edit Course" aria-label="Edit Course"><svg class="ic"><use href="#i-edit"/></svg></a>
+                            <a href="{% url 'courses:course_delete' course.id %}" class="act act-del" title="Delete Course" aria-label="Delete Course"><svg class="ic"><use href="#i-trash"/></svg></a>
+                            {% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <nav class="pager" aria-label="Page navigation">
+        <span class="pager-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        <div class="pager-links">
+            {% if page_obj.has_previous %}
+            <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status|urlencode }}{% endif %}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status|urlencode }}{% endif %}">Previous</a>
+            {% endif %}
+            <span class="is-current">{{ page_obj.number }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status|urlencode }}{% endif %}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search|urlencode }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status|urlencode }}{% endif %}">Last</a>
+            {% endif %}
+        </div>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="empty">
+        <svg class="ic"><use href="#i-inbox"/></svg>
+        <h3>No courses found</h3>
+        <p>Try a different search or status filter.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
